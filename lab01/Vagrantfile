@@ -1,0 +1,81 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/bionic64"
+  config.vm.provider "virtualbox" do |vb|
+     vb.gui = false
+     vb.memory = "1024"
+     vb.cpus = "2" 
+  end
+  
+  config.vm.define "manager1" do |manager1|
+    manager1.vm.network "private_network", ip: "192.168.50.4"
+    manager1.vm.provision "shell", inline: <<-SHELL
+      apt-get update && apt-get install -y curl
+      curl -fsSL https://get.docker.com | bash
+      hostname elliot-man-01
+      apt-get install nfs-server -y
+      mkdir -p /opt/Arquivos
+    SHELL
+    manager1.vm.synced_folder "./config", "/configs"
+    manager1.vm.synced_folder ".", "/vagrant", disabled: "true"
+  end
+  config.vm.define "manager2" do |manager2|
+    manager2.vm.network "private_network", ip: "192.168.50.5"
+    manager2.vm.provision "shell", inline: <<-SHELL
+      apt-get update && apt-get install -y curl
+      curl -fsSL https://get.docker.com | bash
+      hostname elliot-man-02
+      apt-get install nfs-server -y
+      mkdir -p /opt/Arquivos
+    SHELL
+    manager2.vm.synced_folder "./config", "/configs"
+    manager2.vm.synced_folder ".", "/vagrant", disabled: "true"
+  end
+  config.vm.define "manager3" do |manager3|
+    manager3.vm.network "private_network", ip: "192.168.50.6"
+    manager3.vm.provision "shell", inline: <<-SHELL
+      apt-get update && apt-get install -y curl
+      curl -fsSL https://get.docker.com | bash
+      hostname elliot-man-03
+      apt-get install nfs-server -y
+      mkdir -p /opt/Arquivos
+    SHELL
+    manager3.vm.synced_folder "./config", "/configs"
+    manager3.vm.synced_folder ".", "/vagrant", disabled: "true"
+  end
+  config.vm.define "worker1" do |worker1|
+    worker1.vm.network "private_network", ip: "192.168.50.7"
+    worker1.vm.provision "shell", inline: <<-SHELL
+      apt-get update && apt-get install -y curl
+      curl -fsSL https://get.docker.com | bash
+      hostname elliot-worker-01
+      apt-get install nfs-common -y
+    SHELL
+    worker1.vm.synced_folder "./config", "/configs"
+    worker1.vm.synced_folder ".", "/vagrant", disabled: "true"
+  end
+  config.vm.define "worker2" do |worker2|
+    worker2.vm.network "private_network", ip: "192.168.50.8"
+    worker2.vm.provision "shell", inline: <<-SHELL
+      apt-get update && apt-get install -y curl
+      curl -fsSL https://get.docker.com | bash
+      hostname elliot-worker-02
+      apt-get install nfs-common -y
+    SHELL
+    worker2.vm.synced_folder "./config", "/configs"
+    worker2.vm.synced_folder ".", "/vagrant", disabled: "true"
+  end
+  config.vm.define "worker3" do |worker3|
+    worker3.vm.network "private_network", ip: "192.168.50.9"
+    worker3.vm.provision "shell", inline: <<-SHELL
+      apt-get update && apt-get install -y curl
+      curl -fsSL https://get.docker.com | bash
+      hostname elliot-worker-03
+      apt-get install nfs-common -y
+    SHELL
+    worker3.vm.synced_folder "./config", "/configs"
+    worker3.vm.synced_folder ".", "/vagrant", disabled: "true"
+  end
+end
