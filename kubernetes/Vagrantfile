@@ -1,0 +1,43 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/bionic64"
+  config.vm.provider "virtualbox" do |vb|
+     vb.gui = false
+     vb.memory = "2048"
+     vb.cpus = "2" 
+  end
+  
+  config.vm.define "k8smaster" do |master|
+    master.vm.network "private_network", ip: "192.168.30.4"
+    master.vm.provider "virtualbox" do |vb|
+        vb.memory = "4096"
+        vb.cpus = "2"
+    end
+    master.vm.provision "shell", inline: <<-SHELL
+      apt-get update && apt-get install -y curl
+      hostname elliot-k8s-master
+    SHELL
+    master.vm.synced_folder "./config", "/configs"
+    master.vm.synced_folder ".", "/vagrant", disabled: "true"
+  end
+  config.vm.define "k8sworker1" do |worker1|
+    worker1.vm.network "private_network", ip: "192.168.30.5"
+    worker1.vm.provision "shell", inline: <<-SHELL
+      apt-get update && apt-get install -y curl
+      hostname elliot-worker-01
+    SHELL
+    worker1.vm.synced_folder "./config", "/configs"
+    worker1.vm.synced_folder ".", "/vagrant", disabled: "true"
+  end
+  config.vm.define "k8sworker2" do |worker2|
+    worker2.vm.network "private_network", ip: "192.168.30.6"
+    worker2.vm.provision "shell", inline: <<-SHELL
+      apt-get update && apt-get install -y curl
+      hostname elliot-worker-02
+    SHELL
+    worker2.vm.synced_folder "./config", "/configs"
+    worker2.vm.synced_folder ".", "/vagrant", disabled: "true"
+  end
+end

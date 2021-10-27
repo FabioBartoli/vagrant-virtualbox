@@ -1,1 +1,1 @@
-{"virtualbox":{"/configs":{"guestpath":"/configs","hostpath":"/home/fabio/Vagrant/lab01/config","disabled":false,"__vagrantfile":true}}}
+{"virtualbox":{"/configs":{"guestpath":"/configs","hostpath":"/home/fabio/Vagrant/vagrant-virtualbox/lab01/config","disabled":false,"__vagrantfile":true}}}
