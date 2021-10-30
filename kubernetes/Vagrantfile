@@ -21,6 +21,7 @@ Vagrant.configure("2") do |config|
       hostname elliot-k8s-master
       curl -fsSL https://get.docker.com | bash
       sudo cp -f /tmp/docker/daemon.json /etc/docker/
+      sudo cp -f /tmp/docker/k8s.conf /etc/modules-load-d/
       sudo mkdir -p /etc/systemd/system/docker.service.d
       sudo systemctl daemon-reload
       sudo systemctl restart docker
@@ -50,6 +51,7 @@ Vagrant.configure("2") do |config|
       hostname elliot-worker-01
       curl -fsSL https://get.docker.com | bash
       sudo cp -f /tmp/docker/daemon.json /etc/docker/
+      sudo cp -f /tmp/docker/k8s.conf /etc/modules-load-d/
       sudo mkdir -p /etc/systemd/system/docker.service.d
       sudo systemctl daemon-reload
       sudo systemctl restart docker
@@ -72,6 +74,7 @@ Vagrant.configure("2") do |config|
       hostname elliot-worker-02
       curl -fsSL https://get.docker.com | bash
       sudo cp -f /tmp/docker/daemon.json /etc/docker/
+      sudo cp -f /tmp/docker/k8s.conf /etc/modules-load-d/
       sudo mkdir -p /etc/systemd/system/docker.service.d
       sudo systemctl daemon-reload
       sudo systemctl restart docker
