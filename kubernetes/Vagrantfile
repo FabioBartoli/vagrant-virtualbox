@@ -31,7 +31,6 @@ Vagrant.configure("2") do |config|
       sudo apt-get install -y kubelet kubeadm kubectl
       export KUBECONFIG=/etc/kubernetes/kubelet.conf
       sudo swapoff -a
-      br_netfilter ip_vs ip_vs_rr ip_vs_sh ip_vs_wrr nf_conntrack_ipv4
       sudo kubeadm config images pull
       sudo kubeadm init --apiserver-advertise-address 192.168.15.70 --apiserver-cert-extra-sans=10.0.2.15,0.0.0.0
       mkdir -p $HOME/.kube
