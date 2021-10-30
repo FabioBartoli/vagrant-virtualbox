@@ -15,14 +15,11 @@ Vagrant.configure("2") do |config|
         vb.memory = "4096"
         vb.cpus = "2"
     end
+    master.vm.synced_folder "./docker", "/tmp/docker"
     master.vm.provision "shell", inline: <<-SHELL
       apt-get update && apt-get install -y curl
       hostname elliot-k8s-master
       curl -fsSL https://get.docker.com | bash
-      mkdir /tmp/docker
-    SHELL
-    master.vm.synced_folder "./docker", "/tmp/docker"
-    master.vm.provision "shell", inline: <<-SHELL
       sudo cp -f /tmp/docker/daemon.json /etc/docker/
       sudo mkdir -p /etc/systemd/system/docker.service.d
       sudo systemctl daemon-reload
@@ -46,14 +43,11 @@ Vagrant.configure("2") do |config|
   end
   config.vm.define "k8sworker1" do |worker1|
     worker1.vm.network "public_network", bridge: "enx00e04c7c3ee3",  ip: "192.168.15.71"
+    worker1.vm.synced_folder "./docker", "/tmp/docker"
     worker1.vm.provision "shell", inline: <<-SHELL
       apt-get update && apt-get install -y curl
       hostname elliot-worker-01
       curl -fsSL https://get.docker.com | bash
-      mkdir /tmp/docker
-    SHELL
-    worker1.vm.synced_folder "./docker", "/tmp/docker"
-    worker1.vm.provision "shell", inline: <<-SHELL
       sudo cp -f /tmp/docker/daemon.json /etc/docker/
       sudo mkdir -p /etc/systemd/system/docker.service.d
       sudo systemctl daemon-reload
@@ -71,14 +65,11 @@ Vagrant.configure("2") do |config|
   end
   config.vm.define "k8sworker2" do |worker2|
     worker2.vm.network "public_network", bridge: "enx00e04c7c3ee3", ip: "192.168.15.72"
+    worker2.vm.synced_folder "./docker", "/tmp/docker"  
     worker2.vm.provision "shell", inline: <<-SHELL
       apt-get update && apt-get install -y curl
       hostname elliot-worker-02
       curl -fsSL https://get.docker.com | bash
-      mkdir /tmp/docker
-    SHELL
-    worker2.vm.synced_folder "./docker", "/tmp/docker"
-    worker2.vm.provision "shell", inline: <<-SHELL
       sudo cp -f /tmp/docker/daemon.json /etc/docker/
       sudo mkdir -p /etc/systemd/system/docker.service.d
       sudo systemctl daemon-reload
