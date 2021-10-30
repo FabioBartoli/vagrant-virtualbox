@@ -19,16 +19,11 @@ Vagrant.configure("2") do |config|
       apt-get update && apt-get install -y curl
       hostname elliot-k8s-master
       curl -fsSL https://get.docker.com | bash
-      cat > /etc/docker/daemon.json <<EOF
-      {
-        "exec-opts": ["native.cgroupdriver=systemd"],
-        "log-driver": "json-file",
-        "log-opts": {
-        "max-size": "100m"
-        },
-  	"storage-driver": "overlay2"
-      }
-      EOF
+      mkdir /tmp/docker
+    SHELL
+    master.vm.synced_folder "./docker", "/tmp/docker"
+    master.vm.provision "shell", inline: <<-SHELL
+      sudo cp -f /tmp/docker/daemon.json /etc/docker/
       sudo mkdir -p /etc/systemd/system/docker.service.d
       sudo systemctl daemon-reload
       sudo systemctl restart docker
@@ -39,6 +34,7 @@ Vagrant.configure("2") do |config|
       sudo apt-get install -y kubelet kubeadm kubectl
       export KUBECONFIG=/etc/kubernetes/kubelet.conf
       sudo swapoff -a
+      br_netfilter ip_vs ip_vs_rr ip_vs_sh ip_vs_wrr nf_conntrack_ipv4
       sudo kubeadm config images pull
       sudo kubeadm init --apiserver-advertise-address 192.168.15.70 --apiserver-cert-extra-sans=10.0.2.15,0.0.0.0
       mkdir -p $HOME/.kube
@@ -54,16 +50,11 @@ Vagrant.configure("2") do |config|
       apt-get update && apt-get install -y curl
       hostname elliot-worker-01
       curl -fsSL https://get.docker.com | bash
-      cat > /etc/docker/daemon.json <<EOF
-      { 
-        "exec-opts": ["native.cgroupdriver=systemd"],
-        "log-driver": "json-file",
-        "log-opts": {
-        "max-size": "100m"
-        },
-        "storage-driver": "overlay2"
-      } 
-      EOF
+      mkdir /tmp/docker
+    SHELL
+    worker1.vm.synced_folder "./docker", "/tmp/docker"
+    worker1.vm.provision "shell", inline: <<-SHELL
+      sudo cp -f /tmp/docker/daemon.json /etc/docker/
       sudo mkdir -p /etc/systemd/system/docker.service.d
       sudo systemctl daemon-reload
       sudo systemctl restart docker
@@ -84,16 +75,11 @@ Vagrant.configure("2") do |config|
       apt-get update && apt-get install -y curl
       hostname elliot-worker-02
       curl -fsSL https://get.docker.com | bash
-      cat > /etc/docker/daemon.json <<EOF
-      { 
-        "exec-opts": ["native.cgroupdriver=systemd"],
-        "log-driver": "json-file",
-        "log-opts": {
-        "max-size": "100m"
-        },
-        "storage-driver": "overlay2"
-      } 
-      EOF
+      mkdir /tmp/docker
+    SHELL
+    worker2.vm.synced_folder "./docker", "/tmp/docker"
+    worker2.vm.provision "shell", inline: <<-SHELL
+      sudo cp -f /tmp/docker/daemon.json /etc/docker/
       sudo mkdir -p /etc/systemd/system/docker.service.d
       sudo systemctl daemon-reload
       sudo systemctl restart docker
