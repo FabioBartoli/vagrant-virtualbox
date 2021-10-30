@@ -10,7 +10,7 @@ Vagrant.configure("2") do |config|
   end
   
   config.vm.define "k8smaster" do |master|
-    master.vm.network "private_network", ip: "192.168.30.4"
+    master.vm.network "public_network", bridge: "enx00e04c7c3ee3", ip: "192.168.15.70"
     master.vm.provider "virtualbox" do |vb|
         vb.memory = "4096"
         vb.cpus = "2"
@@ -18,24 +18,92 @@ Vagrant.configure("2") do |config|
     master.vm.provision "shell", inline: <<-SHELL
       apt-get update && apt-get install -y curl
       hostname elliot-k8s-master
+      curl -fsSL https://get.docker.com | bash
+      cat > /etc/docker/daemon.json <<EOF
+      {
+        "exec-opts": ["native.cgroupdriver=systemd"],
+        "log-driver": "json-file",
+        "log-opts": {
+        "max-size": "100m"
+        },
+  	"storage-driver": "overlay2"
+      }
+      EOF
+      sudo mkdir -p /etc/systemd/system/docker.service.d
+      sudo systemctl daemon-reload
+      sudo systemctl restart docker
+      sudo apt-get update && sudo apt-get install -y apt-transport-https gnupg2
+      curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+      sudo echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list
+      sudo apt-get update
+      sudo apt-get install -y kubelet kubeadm kubectl
+      export KUBECONFIG=/etc/kubernetes/kubelet.conf
+      sudo swapoff -a
+      sudo kubeadm config images pull
+      sudo kubeadm init --apiserver-advertise-address 192.168.15.70 --apiserver-cert-extra-sans=10.0.2.15,0.0.0.0
+      mkdir -p $HOME/.kube
+      sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+      sudo chown $(id -u):$(id -g) $HOME/.kube/config
     SHELL
     master.vm.synced_folder "./config", "/configs"
     master.vm.synced_folder ".", "/vagrant", disabled: "true"
   end
   config.vm.define "k8sworker1" do |worker1|
-    worker1.vm.network "private_network", ip: "192.168.30.5"
+    worker1.vm.network "public_network", bridge: "enx00e04c7c3ee3",  ip: "192.168.15.71"
     worker1.vm.provision "shell", inline: <<-SHELL
       apt-get update && apt-get install -y curl
       hostname elliot-worker-01
+      curl -fsSL https://get.docker.com | bash
+      cat > /etc/docker/daemon.json <<EOF
+      { 
+        "exec-opts": ["native.cgroupdriver=systemd"],
+        "log-driver": "json-file",
+        "log-opts": {
+        "max-size": "100m"
+        },
+        "storage-driver": "overlay2"
+      } 
+      EOF
+      sudo mkdir -p /etc/systemd/system/docker.service.d
+      sudo systemctl daemon-reload
+      sudo systemctl restart docker
+      sudo apt-get update && sudo apt-get install -y apt-transport-https gnupg2
+      curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+      sudo echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list
+      sudo apt-get update
+      sudo apt-get install -y kubelet kubeadm kubectl
+      export KUBECONFIG=/etc/kubernetes/kubelet.conf
+      sudo swapoff -a
     SHELL
     worker1.vm.synced_folder "./config", "/configs"
     worker1.vm.synced_folder ".", "/vagrant", disabled: "true"
   end
   config.vm.define "k8sworker2" do |worker2|
-    worker2.vm.network "private_network", ip: "192.168.30.6"
+    worker2.vm.network "public_network", bridge: "enx00e04c7c3ee3", ip: "192.168.15.72"
     worker2.vm.provision "shell", inline: <<-SHELL
       apt-get update && apt-get install -y curl
       hostname elliot-worker-02
+      curl -fsSL https://get.docker.com | bash
+      cat > /etc/docker/daemon.json <<EOF
+      { 
+        "exec-opts": ["native.cgroupdriver=systemd"],
+        "log-driver": "json-file",
+        "log-opts": {
+        "max-size": "100m"
+        },
+        "storage-driver": "overlay2"
+      } 
+      EOF
+      sudo mkdir -p /etc/systemd/system/docker.service.d
+      sudo systemctl daemon-reload
+      sudo systemctl restart docker
+      sudo apt-get update && sudo apt-get install -y apt-transport-https gnupg2
+      curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+      sudo echo "deb http://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list
+      sudo apt-get update
+      sudo apt-get install -y kubelet kubeadm kubectl
+      export KUBECONFIG=/etc/kubernetes/kubelet.conf
+      sudo swapoff -a
     SHELL
     worker2.vm.synced_folder "./config", "/configs"
     worker2.vm.synced_folder ".", "/vagrant", disabled: "true"
