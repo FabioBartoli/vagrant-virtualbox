@@ -1,1 +1,0 @@
-{"virtualbox":{"/tmp/docker":{"guestpath":"/tmp/docker","hostpath":"/home/fabio/Vagrant/vagrant-virtualbox/kubernetes/docker","disabled":false,"__vagrantfile":true},"/configs":{"guestpath":"/configs","hostpath":"/home/fabio/Vagrant/vagrant-virtualbox/kubernetes/config","disabled":false,"__vagrantfile":true}}}
