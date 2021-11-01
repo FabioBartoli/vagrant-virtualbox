@@ -1,5 +1,6 @@
 lab01/.vagrant/
 kubernetes/.vagrant/
+kubernetes-HA/.vagrant/
 .log
 kubernetes/ubuntu-bionic-18.04-cloudimg-console.log
 kubernetes-HA/ubuntu-bionic-18.04-cloudimg-console.log
