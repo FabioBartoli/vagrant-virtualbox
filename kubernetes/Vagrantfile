@@ -10,15 +10,17 @@ Vagrant.configure("2") do |config|
   end
   
   config.vm.define "k8smaster" do |master|
-    master.vm.network "public_network", bridge: "enx00e04c7c3ee3", ip: "192.168.15.70"
+    master.vm.network "public_network", bridge: "enx00e04c7c3ee3", ip: "192.168.15.80"
+    master.vm.synced_folder "./docker", "/tmp/docker"
     master.vm.provider "virtualbox" do |vb|
-        vb.memory = "4096"
+        vb.memory = "6144"
         vb.cpus = "2"
     end
-    master.vm.synced_folder "./docker", "/tmp/docker"
     master.vm.provision "shell", inline: <<-SHELL
+      export DEBIAN_FRONTEND=noninteractive
       apt-get update && apt-get install -y curl
       hostname elliot-k8s-master
+      echo "127.0.0.1 elliot-k8s-master" >> /etc/hosts
       curl -fsSL https://get.docker.com | bash
       sudo cp -f /tmp/docker/daemon.json /etc/docker/
       sudo mkdir -p /etc/systemd/system/docker.service.d
@@ -33,19 +35,15 @@ Vagrant.configure("2") do |config|
       sudo cp -f /tmp/docker/k8s.conf /etc/modules-load.d/
       sudo swapoff -a
       sudo kubeadm config images pull
-      sudo kubeadm init --apiserver-advertise-address 192.168.15.70 --apiserver-cert-extra-sans=10.0.2.15,0.0.0.0
-      mkdir -p $HOME/.kube
-      sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-      sudo chown $(id -u):$(id -g) $HOME/.kube/config
-      kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
     SHELL
     master.vm.synced_folder "./config", "/configs"
     master.vm.synced_folder ".", "/vagrant", disabled: "true"
   end
   config.vm.define "k8sworker1" do |worker1|
-    worker1.vm.network "public_network", bridge: "enx00e04c7c3ee3",  ip: "192.168.15.71"
+    worker1.vm.network "public_network", bridge: "enx00e04c7c3ee3",  ip: "192.168.15.81"
     worker1.vm.synced_folder "./docker", "/tmp/docker"
     worker1.vm.provision "shell", inline: <<-SHELL
+      export DEBIAN_FRONTEND=noninteractive
       apt-get update && apt-get install -y curl
       hostname elliot-worker-01
       curl -fsSL https://get.docker.com | bash
@@ -66,9 +64,10 @@ Vagrant.configure("2") do |config|
     worker1.vm.synced_folder ".", "/vagrant", disabled: "true"
   end
   config.vm.define "k8sworker2" do |worker2|
-    worker2.vm.network "public_network", bridge: "enx00e04c7c3ee3", ip: "192.168.15.72"
+    worker2.vm.network "public_network", bridge: "enx00e04c7c3ee3", ip: "192.168.15.82"
     worker2.vm.synced_folder "./docker", "/tmp/docker"  
     worker2.vm.provision "shell", inline: <<-SHELL
+      export DEBIAN_FRONTEND=noninteractive
       apt-get update && apt-get install -y curl
       hostname elliot-worker-02
       curl -fsSL https://get.docker.com | bash
